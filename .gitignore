@@ -1,0 +1,110 @@
+# ============ SECRETS (MAI COMMITTARE) ============
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+data/cert/
+data/auth.json
+data/canaries.json
+
+# ============ PYTHON ============
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+env/
+.venv/
+build/
+dist/
+*.egg-info/
+*.egg
+
+# ============ JAVASCRIPT / NODE ============
+node_modules/
+npm-debug.log*
+
+# ============ VEGA DATI UTENTE (mai pushare) ============
+# Memorie, log, cache appartengono al singolo utente
+data/
+!data/agent_templates/
+!data/agent_templates/*.json
+.vega_mem0/
+events.log
+*.jsonl
+audit.log.jsonl
+outbound.log.jsonl
+traces.jsonl
+
+# ============ VEGA GENERATED ============
+agents/_pending/
+agents/_pending/*.py
+!agents/_pending/team_base.py
+*.py.bak.*
+client_reports/
+client_files/
+client_files_archive/
+incidents/
+compliance_reports/
+blueprints/
+batch_jobs.json
+cve_report.json
+gdpr_register.json
+admin_invoices.json
+sales_leads.json
+hr_data.json
+rspp_data.json
+training_data.json
+clients.json
+email_inbox_state.json
+briefing_shown.json
+cost_tracking.json
+knowledge_base/
+
+# ============ MODEL CACHE ============
+.cache/
+huggingface/
+.huggingface/
+assets/tts_cache/
+assets/whisper_models/
+chroma/
+chroma_db/
+
+# ============ OS ============
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ============ EDITOR ============
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ============ LOGS ============
+*.log
+logs/
+crash_report_*.txt
+.vega.lock
+.jarvis.lock
+
+# ============ BACKUPS ============
+backups/
+*.backup
+*.bak
+
+# ============ DB ============
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+telemetry.db
+
+# Sensitive user data (added 2026-05)
+memory.json
+.vega.lock
+automations.json
+capabilities.json

@@ -1,0 +1,36 @@
+name: 💡 Feature Request
+description: Proponi una nuova feature
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema che risolve
+      placeholder: "Quando faccio X, devo... vorrei poter..."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Soluzione proposta
+      placeholder: "Aggiungere agente/tool/UI per..."
+    validations:
+      required: true
+  - type: dropdown
+    id: tier
+    attributes:
+      label: A quale layer appartiene?
+      options:
+        - L1 Voice & Audio
+        - L2 Brain & Reasoning
+        - L3 Memory & Knowledge
+        - L4 Tool Ecosystem
+        - L5 Team Agentico (nuovo agente?)
+        - L6 Security
+        - L7 UI/UX & PWA
+        - L8 Infrastruttura
+        - Cross-cutting / Documentation
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative considerate

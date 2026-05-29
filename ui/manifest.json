@@ -1,0 +1,25 @@
+{
+  "name": "V.E.G.A.",
+  "short_name": "Vega",
+  "description": "VEGA — Voice. Eyes. Guidance. Agency. L'assistente che orbita intorno a te.",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#03060c",
+  "theme_color": "#8ba4ff",
+  "icons": [
+    {
+      "src": "/assets/vega.ico",
+      "sizes": "256x256",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/assets/vega_preview.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "scope": "/"
+}

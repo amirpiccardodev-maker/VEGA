@@ -1,0 +1,98 @@
+================================================================
+ V.E.G.A. - Come trasferire Vega su un nuovo PC
+================================================================
+
+In 4 passaggi:
+
+
+[1] SUL VECCHIO PC: prepara il pacchetto
+-----------------------------------------
+Chiudi Vega (bottone ⏻ rosso in basso a destra).
+
+Vai nella cartella:
+   C:\Users\amirp\vega\
+
+Cancella questi due elementi (solo se ci sono):
+   - cartella "venv"     (verra' ricreata sul nuovo PC)
+   - file ".vega.lock" (file temporaneo)
+
+Comprimi la cartella "vega" in un file ZIP.
+Trasferiscila sul nuovo PC (chiavetta USB, OneDrive, Drive, mail, ecc.).
+
+
+[2] SUL NUOVO PC: installa Python
+----------------------------------
+Apri https://python.org/downloads
+Scarica Python 3.12 o piu' recente.
+
+DURANTE L'INSTALLAZIONE: spunta la casella "Add Python to PATH"
+(in basso nel primo passaggio dell'installer). E' importante.
+
+
+[3] SUL NUOVO PC: scompatta e lancia setup
+-------------------------------------------
+Scompatta il file ZIP di Vega dove vuoi, ad esempio:
+   C:\Users\<tuonome>\vega\
+
+Apri la cartella vega e fai DOPPIO CLICK su:
+   setup.bat
+
+Lo script in automatico:
+  - Verifica che Python sia installato
+  - Crea l'ambiente venv
+  - Installa tutte le dipendenze (5-10 minuti la prima volta)
+  - Genera l'icona Vega
+  - Crea lo shortcut sul desktop
+  - Attiva l'avvio automatico al login Windows
+
+Aspetta che dica "INSTALLAZIONE COMPLETATA".
+
+
+[4] APRI VEGA
+---------------
+Doppio click sull'icona "Vega" sul desktop.
+
+Il PRIMO avvio scarica i modelli AI:
+  - Whisper (riconoscimento vocale, ~150MB)
+  - openWakeWord (~10MB)
+  - sentence-transformers per RAG (~120MB)
+Totale ~280MB. Solo la prima volta. Aspetta che la percentuale
+arrivi a 100% e Vega dica "Pronto, Amir".
+
+Avvii successivi: 10-15 secondi.
+
+
+================================================================
+ COSA RESTA ?
+================================================================
+
+Tutto cio' che hai memorizzato:
+  - memory.json   -> fatti su di te, todo, note, conversazioni
+  - .env          -> API keys (Anthropic, Gmail)
+  - assets/music  -> i tuoi MP3 caricati
+  - docs/         -> i tuoi documenti per il RAG
+  - docs_index.npz e docs_index_meta.json -> indice RAG gia' calcolato
+
+Niente di tutto questo va rifatto sul nuovo PC.
+
+
+================================================================
+ PROBLEMI COMUNI
+================================================================
+
+"Python non trovato"
+   Non hai spuntato "Add to PATH" durante l'install di Python.
+   Soluzione: disinstalla Python, reinstalla spuntando la casella.
+
+"setup.bat dice errore durante pip install"
+   Connessione internet ballerina. Rilancia setup.bat.
+
+"L'avvio si ferma a 10%"
+   Vedi file vega_error.log nella cartella per dettagli.
+
+"L'icona non si vede sul desktop"
+   Apri la cartella vega e fai click destro su Vega.vbs
+   -> Crea collegamento -> Sposta il collegamento sul desktop.
+
+
+================================================================

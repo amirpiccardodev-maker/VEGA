@@ -1,0 +1,29 @@
+{
+  "feeds": [
+    {
+      "name": "ANSA Top",
+      "url": "https://www.ansa.it/sito/ansait_rss.xml",
+      "lang": "it"
+    },
+    {
+      "name": "Repubblica HP",
+      "url": "https://www.repubblica.it/rss/homepage/rss2.0.xml",
+      "lang": "it"
+    },
+    {
+      "name": "Il Post",
+      "url": "https://www.ilpost.it/feed/",
+      "lang": "it"
+    },
+    {
+      "name": "HN",
+      "url": "https://news.ycombinator.com/rss",
+      "lang": "en"
+    },
+    {
+      "name": "BBC World",
+      "url": "http://feeds.bbci.co.uk/news/world/rss.xml",
+      "lang": "en"
+    }
+  ]
+}

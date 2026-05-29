@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#03060c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vega">
+<title>V.E.G.A.</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" type="image/x-icon" href="/assets/vega.ico">
+<link rel="apple-touch-icon" href="/assets/vega_preview.png">
+<link rel="shortcut icon" type="image/x-icon" href="/assets/vega.ico">
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/theme.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@300;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<a class="skip-link" href="#main-content">Salta al contenuto principale</a>
+
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div class="bg-noise"></div>
+<div class="bg-particles"></div>
+<div class="bg-scanline"></div>
+
+<!-- BOOT OVERLAY -->
+<div id="boot" class="boot">
+  <div class="boot-inner">
+    <div class="boot-title">V.E.G.A.</div>
+    <div class="boot-sub">JUST A RATHER VERY INTELLIGENT SYSTEM</div>
+    <div class="boot-log" id="boot-log"></div>
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="dot"></span>
+    <span class="brand">V.E.G.A.</span>
+    <span class="version">v3.0</span>
+  </div>
+  <div class="topbar-center">
+    <span class="status" id="status">OFFLINE</span>
+  </div>
+  <div class="topbar-right">
+    <span class="clock" id="clock">--:--:--</span>
+    <span class="date" id="date">---</span>
+    <button id="help-btn" class="fs-btn" title="Aiuto - comandi disponibili">?</button>
+    <button id="diag-btn" class="fs-btn" title="Diagnosi sistema">🩺</button>
+    <button id="pcmon-btn" class="fs-btn" title="Stato PC dettagliato">🖥️</button>
+    <button id="stats-btn" class="fs-btn" title="Statistiche utilizzo">📊</button>
+    <button id="automation-btn" class="fs-btn" title="Automation Mode — team agentico">🏛</button>
+    <button id="prop-btn" class="fs-btn" title="Proposte Vega (suggerimenti, self-healing)">💡</button>
+    <button id="cards-history-btn" class="fs-btn" title="Storico card sessione" onclick="window._openCardHistory&&window._openCardHistory()">🗂</button>
+    <button id="ops-btn" class="fs-btn" title="Operations Center (log, workflow, task queue, health)" onclick="window._openOpsCenter&&window._openOpsCenter()">🛠</button>
+    <button id="settings-btn" class="fs-btn" title="Impostazioni">⚙</button>
+    <button id="fs-btn" class="fs-btn" title="Schermo intero (F11)">⛶</button>
+  </div>
+</header>
+
+<!-- Mic privacy indicator: ALWAYS visible, color-coded by state.
+     Click = global mic kill switch (pauses Vega listening). -->
+<div id="mic-hud" class="mic-hud mic-off" title="Stato microfono — click per disattivare">
+  <span class="mic-dot"></span>
+  <span class="mic-label">MIC OFF</span>
+</div>
+
+<!-- Onboarding wizard (first run only) -->
+<div id="onboarding-modal" class="modal">
+  <div class="modal-box modal-big">
+    <div class="modal-head">
+      <span>👋 BENVENUTO IN VEGA</span>
+      <button class="modal-close" data-close="onboarding-modal" title="Salta">×</button>
+    </div>
+    <div class="modal-body" id="onboarding-body">
+      <div class="onb-step" data-step="1">
+        <div class="onb-title">Ciao! Iniziamo in 4 passi rapidi.</div>
+        <div class="onb-desc">
+          Vega è il tuo assistente personale AI. Funziona a voce, a tastiera, e ha
+          31+ esperti virtuali a tua disposizione.<br><br>
+          Clicca <b>Avanti</b> per configurarlo in 60 secondi.
+        </div>
+      </div>
+      <div class="onb-step" data-step="2" hidden>
+        <div class="onb-title">🔒 Vuoi proteggere l'accesso con un PIN?</div>
+        <div class="onb-desc">
+          Il PIN serve quando accedi da fuori il PC (es. dal telefono in LAN).
+          Da localhost non serve. <span style="opacity:.7">Lascia vuoto per saltare.</span>
+        </div>
+        <input type="text" id="onb-pin" placeholder="PIN (4-8 cifre)" maxlength="8"
+          inputmode="numeric" pattern="[0-9]*"
+          style="width:200px;text-align:center;font-size:1.4em;letter-spacing:0.5em;margin-top:14px">
+      </div>
+      <div class="onb-step" data-step="3" hidden>
+        <div class="onb-title">📍 Dove vivi?</div>
+        <div class="onb-desc">
+          Serve per il meteo automatico nel briefing mattutino. Es: "Milano", "Roma", "Bologna".
+        </div>
+        <input type="text" id="onb-city" placeholder="La tua città"
+          style="width:280px;font-size:1.1em;margin-top:14px">
+      </div>
+      <div class="onb-step" data-step="4" hidden>
+        <div class="onb-title">🏛 Vuoi attivare la modalità Team?</div>
+        <div class="onb-desc">
+          Sblocca tutti i 31 agenti specializzati (DPO, CISO, Sales, Admin, RSPP, ecc.).
+          Consigliato se usi Vega per lavoro.
+          <span style="opacity:.7">Puoi sempre cambiare in Impostazioni.</span>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:10px;justify-content:center">
+          <button class="modal-action" id="onb-team-yes">SÌ, attiva</button>
+          <button class="chat-btn-secondary" id="onb-team-no">No, base</button>
+        </div>
+      </div>
+      <div class="onb-step" data-step="5" hidden>
+        <div class="onb-title">✅ Tutto pronto!</div>
+        <div class="onb-desc">
+          Premi il bottone <b>?</b> in alto per il tutorial completo.<br>
+          Apri <b>🏛 Automation Mode</b> per vedere il tuo team agentico.<br>
+          Inizia digitando o premendo il microfono.
+        </div>
+      </div>
+      <div class="onb-nav">
+        <button id="onb-back" class="chat-btn-secondary" hidden>Indietro</button>
+        <span class="onb-progress" id="onb-progress">1 / 5</span>
+        <button id="onb-next" class="modal-action">Avanti</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div id="settings-modal" class="modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span>IMPOSTAZIONI</span>
+      <button class="modal-close" data-close="settings-modal">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="setting-row">
+        <label>Voce</label>
+        <select id="set-voice">
+          <option value="it-IT-GiuseppeNeural">Giuseppe (maschile, naturale)</option>
+          <option value="it-IT-DiegoNeural">Diego (maschile, formale)</option>
+          <option value="it-IT-IsabellaNeural">Isabella (femminile, calda)</option>
+          <option value="it-IT-ElsaNeural">Elsa (femminile, amichevole)</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label>Velocità voce</label>
+        <select id="set-voice-rate">
+          <option value="-15%">Più lenta</option>
+          <option value="-3%">Normale (default)</option>
+          <option value="+10%">Più veloce</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label>Personalità</label>
+        <select id="set-personality">
+          <option value="friendly">Amichevole (default)</option>
+          <option value="stark">Stark (formale, maggiordomo)</option>
+          <option value="casual">Casual (rilassato)</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label>Modalità</label>
+        <select id="set-mode">
+          <option value="general">Generale</option>
+          <option value="developer">Sviluppatore</option>
+          <option value="work">Lavoro</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label>Città (meteo)</label>
+        <input id="set-home" type="text" placeholder="es. Imperia, Roma">
+      </div>
+      <div class="setting-row">
+        <label>Musica all'avvio</label>
+        <label class="toggle">
+          <input type="checkbox" id="set-music">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <label>Effetti sonori sci-fi</label>
+        <label class="toggle">
+          <input type="checkbox" id="set-sounds">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <label>Modalità privata</label>
+        <label class="toggle">
+          <input type="checkbox" id="set-privacy">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <label>Interrompi Vega con la voce <span style="opacity:.6;font-size:.85em">(usa cuffie)</span></label>
+        <label class="toggle">
+          <input type="checkbox" id="set-voice-interrupt">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <label>Ascolto continuo <span style="opacity:.6;font-size:.85em">(no "Vega" ogni volta)</span></label>
+        <label class="toggle">
+          <input type="checkbox" id="set-always-on">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <label>Sincronizza voce + testo <span style="opacity:.6;font-size:.85em">(testo appare quando parte la voce)</span></label>
+        <label class="toggle">
+          <input type="checkbox" id="set-sync-voice-text" checked>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <label>Tema interfaccia</label>
+        <select id="set-theme" style="background:rgba(0,30,60,.5);color:var(--hud-cyan);border:1px solid var(--hud-cyan-faint);padding:6px 10px;border-radius:4px;font-family:var(--font-ui)">
+          <option value="dark">HUD scuro (default)</option>
+          <option value="light">Chiaro</option>
+          <option value="auto">Auto (orario)</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label>Local LLM (Ollama) <span id="set-local-status" style="opacity:.6;font-size:.85em">— offline</span></label>
+        <label class="toggle">
+          <input type="checkbox" id="set-local-brain">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <label>🏛 Team mode <span style="opacity:.6;font-size:.85em">(Steward classifica + ruta)</span></label>
+        <label class="toggle">
+          <input type="checkbox" id="set-team-mode">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <button id="set-save" class="modal-action">SALVA</button>
+    </div>
+  </div>
+</div>
+
+<!-- Automation Mode (team agentico) modal -->
+<div id="automation-modal" class="modal">
+  <div class="modal-box modal-big modal-xl">
+    <div class="modal-head">
+      <span>🏛 AUTOMATION MODE — TEAM AGENTICO</span>
+      <button class="modal-close" data-close="automation-modal">×</button>
+    </div>
+    <div class="automation-tabs">
+      <button class="auto-tab active" data-view="board">🏛 ORG CHART</button>
+      <button class="auto-tab" data-view="detail">🔍 DETAIL AGENT</button>
+      <button class="auto-tab" data-view="chat">💬 CHAT</button>
+      <button class="auto-tab" data-view="overview">📊 OVERVIEW</button>
+    </div>
+    <div class="modal-body automation-body" data-view="board">
+      <div class="org-chart">
+        <div class="org-tier" data-tier="0">
+          <div class="org-tier-label">⚙ GOVERNANCE</div>
+          <div class="org-tier-tiles" id="tier-0-agents"></div>
+        </div>
+        <div class="org-tier" data-tier="1">
+          <div class="org-tier-label">🛡 COMPLIANCE (veto power)</div>
+          <div class="org-tier-tiles" id="tier-1-agents"></div>
+        </div>
+        <div class="org-tier" data-tier="2">
+          <div class="org-tier-label">⚒ OPERATIONS</div>
+          <div class="org-tier-tiles" id="tier-2-agents"></div>
+        </div>
+        <div class="org-tier" data-tier="3">
+          <div class="org-tier-label">🔭 INTELLIGENCE (daily scout)</div>
+          <div class="org-tier-tiles" id="tier-3-agents"></div>
+        </div>
+        <div class="org-tier" data-tier="4">
+          <div class="org-tier-label">🩺 MONITORING (system health)</div>
+          <div class="org-tier-tiles" id="tier-4-agents"></div>
+        </div>
+      </div>
+      <div class="automation-stream">
+        <div class="stream-label">📜 LIVE INTER-AGENT MESSAGES</div>
+        <div id="team-stream" class="team-stream"></div>
+      </div>
+    </div>
+
+    <div class="modal-body automation-detail" data-view="detail" style="display:none">
+      <div class="detail-empty" id="detail-empty">
+        Seleziona un agente dall'ORG CHART per vedere il dettaglio.
+      </div>
+      <div class="detail-content" id="detail-content" hidden>
+        <div class="detail-header">
+          <div class="detail-icon" id="detail-icon">🤖</div>
+          <div class="detail-titles">
+            <div class="detail-name" id="detail-name"></div>
+            <div class="detail-desc" id="detail-desc"></div>
+            <div class="detail-meta" id="detail-meta"></div>
+          </div>
+          <div class="detail-status-block">
+            <div class="detail-status-dot" id="detail-status-dot"></div>
+            <button id="detail-toggle" class="chat-btn-secondary">PAUSA</button>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-section">
+            <div class="detail-section-label">🔗 GERARCHIA</div>
+            <div id="detail-hierarchy"></div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-label">⚡ AZIONI DISPONIBILI</div>
+            <div id="detail-actions"></div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-label">📈 METRICHE</div>
+            <div id="detail-metrics"></div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-label">💬 CHAT RAPIDA</div>
+            <div class="detail-quickchat">
+              <input id="detail-quickchat-input" type="text"
+                     placeholder="Chiedigli qualcosa veloce..." />
+              <button id="detail-quickchat-send" class="modal-action">▶</button>
+            </div>
+            <div id="detail-quickchat-output"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-body automation-overview" data-view="overview" style="display:none">
+      <div class="overview-grid">
+        <div class="overview-card">
+          <div class="overview-label">TOTALE AGENTI</div>
+          <div class="overview-value" id="ov-total">—</div>
+        </div>
+        <div class="overview-card">
+          <div class="overview-label">ATTIVI (ultimi 5 min)</div>
+          <div class="overview-value" id="ov-active">—</div>
+        </div>
+        <div class="overview-card">
+          <div class="overview-label">DISABILITATI</div>
+          <div class="overview-value" id="ov-disabled">—</div>
+        </div>
+        <div class="overview-card">
+          <div class="overview-label">TASK ESEGUITI (sessione)</div>
+          <div class="overview-value" id="ov-tasks">—</div>
+        </div>
+      </div>
+      <div class="overview-section">
+        <div class="overview-section-label">🏆 TOP AGENTI ATTIVITÀ</div>
+        <div id="ov-top-active"></div>
+      </div>
+      <div class="overview-section">
+        <div class="overview-section-label">😴 INATTIVI DA &gt;1 ORA</div>
+        <div id="ov-inactive"></div>
+      </div>
+      <div class="overview-section">
+        <div class="overview-section-label">⏱ ULTIME ATTIVITÀ</div>
+        <div id="ov-recent"></div>
+      </div>
+    </div>
+
+    <div class="modal-body automation-chat" data-view="chat" style="display:none">
+      <div class="chat-personas" id="chat-personas"></div>
+      <div class="chat-area">
+        <div class="chat-header" id="chat-header">
+          <span>Seleziona un agente</span>
+          <button id="chat-clear" class="chat-btn-secondary">Clear</button>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-row">
+          <textarea id="chat-input" placeholder="Scrivi all'agente selezionato..." rows="2"></textarea>
+          <button id="chat-send" class="modal-action">INVIA</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Proposte (instructions) modal -->
+<div id="prop-modal" class="modal">
+  <div class="modal-box modal-big">
+    <div class="modal-head">
+      <span>PROPOSTE DI VEGA</span>
+      <button class="modal-close" data-close="prop-modal">×</button>
+    </div>
+    <div class="modal-body" id="prop-body">
+      Caricamento...
+    </div>
+  </div>
+</div>
+
+<!-- Stats modal -->
+<div id="stats-modal" class="modal">
+  <div class="modal-box modal-big">
+    <div class="modal-head">
+      <span>STATISTICHE UTILIZZO</span>
+      <button class="modal-close" data-close="stats-modal">×</button>
+    </div>
+    <div class="modal-body" id="stats-body">
+      Caricamento...
+    </div>
+  </div>
+</div>
+
+<!-- PC Monitor modal -->
+<div id="pcmon-modal" class="modal">
+  <div class="modal-box modal-big">
+    <div class="modal-head">
+      <span>STATO PC LIVE</span>
+      <button class="modal-close" data-close="pcmon-modal">×</button>
+    </div>
+    <div class="modal-body" id="pcmon-body">
+      Caricamento...
+    </div>
+  </div>
+</div>
+
+<!-- Diagnostic modal -->
+<div id="diag-modal" class="modal">
+  <div class="modal-box modal-big">
+    <div class="modal-head">
+      <span>DIAGNOSI SISTEMA</span>
+      <button class="modal-close" data-close="diag-modal">×</button>
+    </div>
+    <div class="modal-body" id="diag-body">Caricamento...</div>
+  </div>
+</div>
+
+<!-- Help / Tutorial modal -->
+<div id="help-modal" class="modal">
+  <div class="modal-box modal-big">
+    <div class="modal-head">
+      <span>📖 GUIDA RAPIDA</span>
+      <button class="modal-close" data-close="help-modal">×</button>
+    </div>
+    <div class="help-tabs">
+      <button class="help-tab active" data-htab="voice">🎙 Voce</button>
+      <button class="help-tab" data-htab="agents">🏛 Agenti</button>
+      <button class="help-tab" data-htab="commands">⌨ Comandi</button>
+      <button class="help-tab" data-htab="shortcuts">⚡ Scorciatoie</button>
+      <button class="help-tab" data-htab="privacy">🔐 Privacy</button>
+    </div>
+    <div class="modal-body" id="help-body">
+
+      <div class="help-content" data-htab="voice">
+        <h3>Parlare con Vega a voce</h3>
+        <ul>
+          <li><b>"Vega"</b> / <b>"Ehi Vega"</b> / <b>"Ok Vega"</b> → attiva l'ascolto. Aspetta il bip.</li>
+          <li>Subito dopo, fai la domanda. Lui risponde a voce + testo.</li>
+          <li><b>"Stop Vega"</b> → interrompe quando sta parlando.</li>
+          <li><b>Ascolto continuo</b> (in Impostazioni): niente più "Vega" ogni volta, ti ascolta 60s dopo l'ultima risposta.</li>
+          <li><b>Interrupt vocale</b> (opt-in, serve cuffie): parla mentre Vega parla → si ferma e ascolta.</li>
+        </ul>
+        <p><b>Frasi tipo</b>:</p>
+        <ul>
+          <li>"Che ore sono", "che tempo fa", "leggimi le mail"</li>
+          <li>"Manda mail a Marco", "aggiungi todo: comprare pane"</li>
+          <li>"Genera immagine di un drago al tramonto"</li>
+          <li>"Guarda lo schermo e dimmi cosa vedi"</li>
+          <li>"Pensaci bene su X" → attiva ragionamento profondo</li>
+          <li>"Dibattito su: devo cambiare lavoro?" → 3 voci + sintesi</li>
+        </ul>
+      </div>
+
+      <div class="help-content" data-htab="agents" hidden>
+        <h3>I tuoi 31 esperti virtuali</h3>
+        <p>Apri 🏛 <b>Automation Mode</b> dalla topbar. Vedi 4 reparti:</p>
+        <ul>
+          <li><b>Governance</b>: Steward (direttore), Architect (consulente)</li>
+          <li><b>Compliance</b>: DPO (privacy/GDPR), CISO (cybersec/NIS2), RSPP (sicurezza lavoro D.Lgs 81), Audit Watcher</li>
+          <li><b>Operations</b>: Admin (fisco), Sales (CRM), Email Manager, Report Builder, Client Onboarding, HR, Training, File Org, Knowledge Mgmt, Bug Hunter, Innovator, Marketing, AI Expert</li>
+          <li><b>Intelligence</b>: Scout daily da Garante Privacy, CSIRT, ANSA, Agenzia Entrate, INAIL</li>
+        </ul>
+        <p>Tab <b>💬 Chat con agente</b>: parla direttamente col DPO, CISO, Sales, ecc. in-character.</p>
+        <p><b>Comandi vocali speciali</b>:</p>
+        <ul>
+          <li>"Agente: organizza la mia settimana" → planner multi-step</li>
+          <li>"Missione: trova 5 case in affitto" → long-horizon (lavora autonomamente)</li>
+        </ul>
+      </div>
+
+      <div class="help-content" data-htab="commands" hidden>
+        <h3>Cosa puoi chiedere</h3>
+        <ul>
+          <li><b>Info</b>: meteo, news (📜 daily), wikipedia, ricerca web, vedo immagini, Excel/CSV</li>
+          <li><b>Mail</b>: leggimi inbox, manda mail (sempre conferma prima)</li>
+          <li><b>Sistema</b>: apri Spotify/Word, volume su/giù, blocca PC, screenshot</li>
+          <li><b>Memoria</b>: "ricorda che X", "dimmi cosa sai su Marco" (clusterizza i ricordi)</li>
+          <li><b>Vision</b>: trascina foto/PDF nella finestra, oppure "guarda lo schermo"</li>
+          <li><b>Image gen</b>: "genera immagine di X" (gratis via Pollinations)</li>
+          <li><b>Timer</b>: "imposta timer 10 minuti"</li>
+          <li><b>Compliance pro</b>: "registra trattamento Art. 30 per cliente X", "scadenze fiscali questo mese"</li>
+        </ul>
+      </div>
+
+      <div class="help-content" data-htab="shortcuts" hidden>
+        <h3>Scorciatoie tastiera</h3>
+        <ul>
+          <li><b>F11</b>: schermo intero</li>
+          <li><b>Invio</b>: invia messaggio</li>
+          <li><b>Shift+Invio</b>: nuova riga nel testo</li>
+          <li><b>Esc</b>: chiudi modal/popup</li>
+          <li><b>Drag & drop</b>: trascina file/immagini → Vega li analizza</li>
+        </ul>
+        <h3>Topbar (alto destra)</h3>
+        <ul>
+          <li><b>?</b>: questa guida</li>
+          <li><b>🩺</b>: diagnosi sistema</li>
+          <li><b>🖥</b>: stato PC dettagliato</li>
+          <li><b>📊</b>: statistiche uso + cache hit rate + costi</li>
+          <li><b>🏛</b>: Automation Mode (agenti)</li>
+          <li><b>💡</b>: proposte Innovator + suggerimenti</li>
+          <li><b>⚙</b>: impostazioni</li>
+        </ul>
+      </div>
+
+      <div class="help-content" data-htab="privacy" hidden>
+        <h3>La tua privacy</h3>
+        <ul>
+          <li><b>Tutto è locale</b>: dati su tuo PC, niente cloud (a parte le chiamate AI ad Anthropic, già cifrate HTTPS).</li>
+          <li><b>Modalità privata</b> (Impostazioni): conversazione non viene salvata in memoria.</li>
+          <li><b>PIN</b>: protegge l'accesso da remoto (LAN/mobile). Da localhost niente PIN.</li>
+          <li><b>Mic kill switch</b>: pillola in alto cliccabile → mic OFF immediato.</li>
+          <li><b>Honeypot</b>: stringhe-trappola in memoria; se appaiono in output → alert leak.</li>
+          <li><b>Audit log</b>: ogni azione tracciata con catena hash (tamper-evident).</li>
+        </ul>
+        <p>Per <b>cybersec</b> dettagliata, apri 🏛 Automation Mode → chat col <b>🛡 CISO</b>.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- History / search modal -->
+<div id="search-modal" class="modal">
+  <div class="modal-box modal-big">
+    <div class="modal-head">
+      <span>CERCA IN TUTTO</span>
+      <button class="modal-close" data-close="search-modal">×</button>
+    </div>
+    <div class="modal-body" id="search-body">
+      <input id="search-input" type="text" placeholder="Cerca in conversazioni, note, todo, fatti, automazioni..." style="width:100%;background:rgba(139, 164, 255,0.06);border:1px solid var(--cyan-soft);color:var(--cyan);padding:10px 14px;border-radius:4px;outline:none;font-size:14px;margin-bottom:14px;">
+      <div id="search-results"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="layout">
+
+  <!-- LEFT PANEL -->
+  <aside class="panel left">
+    <div class="card">
+      <div class="card-title">METEO</div>
+      <div class="card-body" id="weather">
+        <div class="weather-temp" id="w-temp">--°</div>
+        <div class="weather-desc" id="w-desc">caricamento</div>
+        <div class="weather-loc" id="w-loc">--</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">MICROFONO</div>
+      <div class="card-body">
+        <div class="mic-meter"><div class="mic-fill" id="mic-fill"></div></div>
+        <div class="mic-label" id="mic-label">-- dB</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">OGGI</div>
+      <div class="card-body">
+        <div class="today-day" id="today-day">--</div>
+        <div class="today-date" id="today-date">--</div>
+        <div class="today-extra" id="today-extra">Sistemi operativi</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">CONSUMO API</div>
+      <div class="card-body usage">
+        <div class="usage-row"><span class="ul">Oggi</span><span class="uv" id="u-today">$0.0000</span></div>
+        <div class="usage-row"><span class="ul">Totale</span><span class="uv" id="u-total">$0.0000</span></div>
+        <div class="usage-row"><span class="ul">Cache hit</span><span class="uv" id="u-cache">--</span></div>
+        <div class="usage-row sub"><span id="u-calls">0 chiamate</span><span id="u-tokens">0 tok</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER STAGE -->
+  <main class="stage">
+    <div class="hud">
+      <canvas id="viz"></canvas>
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="ring r3"></div>
+      <div class="ring-deco"></div>
+      <div class="ring-deco r-deco2"></div>
+      <div class="ripple" id="ripple"></div>
+      <div class="core" id="core"></div>
+      <div class="state-label" id="state-label">IDLE</div>
+      <div class="live-transcript" id="live-transcript"></div>
+    </div>
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <aside class="panel right">
+
+    <!-- MUSIC PLAYER -->
+    <div class="card player">
+      <div class="card-title player-title">
+        <span>♫ PLAYER</span>
+        <span class="player-mini" id="player-mini" title="Aggiungi MP3">+</span>
+      </div>
+      <div class="card-body">
+        <div class="np-title" id="np-title">Nessun brano</div>
+        <div class="np-artist" id="np-artist">Carica i tuoi MP3</div>
+        <div class="seek">
+          <div class="seek-bar" id="seek-bar"><div class="seek-fill" id="seek-fill"></div></div>
+          <div class="seek-times">
+            <span id="cur-time">0:00</span>
+            <span id="dur-time">0:00</span>
+          </div>
+        </div>
+        <div class="player-controls">
+          <button class="pc-btn small" id="pc-shuffle" title="Casuale on/off">⇄</button>
+          <button class="pc-btn" id="pc-prev" title="Precedente">⏮</button>
+          <button class="pc-btn pc-main" id="pc-play" title="Play / Pausa (barra spazio)">▶</button>
+          <button class="pc-btn" id="pc-stop" title="Stop">⏹</button>
+          <button class="pc-btn" id="pc-next" title="Successivo">⏭</button>
+          <button class="pc-btn small" id="pc-repeat" title="Ripeti on/off">⟳</button>
+        </div>
+        <div class="volume-row">
+          <span class="vol-icon">🔊</span>
+          <input type="range" id="pc-vol" min="0" max="100" value="80">
+        </div>
+        <div class="playlist-controls">
+          <input type="file" id="file-add" accept="audio/*" multiple style="display:none">
+          <input type="file" id="folder-add" webkitdirectory directory multiple style="display:none">
+          <button class="pl-btn" id="add-files">+ FILE</button>
+          <button class="pl-btn" id="add-folder">+ CARTELLA</button>
+        </div>
+        <input type="text" id="pl-search" class="pl-search" placeholder="cerca nella libreria...">
+        <div class="pl-count" id="pl-count">0 brani</div>
+        <div class="playlist" id="playlist">
+          <div class="pl-empty">Libreria vuota</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TODOS -->
+    <div class="card">
+      <div class="card-title">DA FARE</div>
+      <div class="card-body todos" id="todos">
+        <div class="tools-empty">Niente in lista</div>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="card">
+      <div class="card-title">AZIONI</div>
+      <div class="card-body tools-log" id="tools-log">
+        <div class="tools-empty">In attesa</div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- CARDS STAGE (visual responses) -->
+<section id="cards-stage" class="cards-stage"></section>
+
+<!-- TRANSCRIPT -->
+<section class="transcript-wrap">
+  <div class="transcript" id="transcript"></div>
+</section>
+
+<!-- INPUT BAR -->
+<footer class="inputbar">
+  <div class="ib-left">
+    <button id="restart-btn" class="ib-action restart-btn" title="Riavvia Vega">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.7.97 6.4 2.6L21 8"/><path d="M21 3v5h-5"/></svg>
+      <span>RIAVVIA</span>
+    </button>
+    <button id="wake-btn" class="ib-action wake-btn" title="Chiama Vega (Ctrl+Alt+J)">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <span>CHIAMA</span>
+    </button>
+  </div>
+
+  <div class="ib-center">
+    <textarea id="text-input" rows="1" placeholder="Scrivi qui... (Invio: invia · Shift+Invio: a capo)" autocomplete="off"></textarea>
+  </div>
+
+  <div class="ib-right">
+    <button id="send-btn" class="ib-icon send" title="Invia">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+    <button id="stop-btn" class="ib-icon stop" title="Stop voce Vega">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+    </button>
+    <button id="shutdown-btn" class="ib-icon shutdown" title="Spegni Vega">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
+    </button>
+  </div>
+
+  <button id="pause-btn" style="display:none">PAUSA</button>
+</footer>
+
+<!-- NOTIFICATION TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- Audio element (one for everything: boot music + library) -->
+<audio id="player-audio" preload="auto"></audio>
+
+<script src="/vega.js"></script>
+</body>
+</html>

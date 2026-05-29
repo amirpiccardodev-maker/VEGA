@@ -1,0 +1,81 @@
+name: Smoke Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  syntax-check:
+    name: Python syntax + imports
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: 'pip'
+
+      - name: Verify Python syntax (all .py files)
+        run: |
+          python -m compileall -q . -x 'venv|\.cache|__pycache__'
+
+      - name: Check imports of core modules (without dependencies)
+        run: |
+          # Verifica che il codice non abbia errori sintassi grossi.
+          # Test reali (full_system_test.py) richiedono deps + API key,
+          # quindi qui facciamo solo smoke statico.
+          python -c "
+          import ast
+          import sys
+          from pathlib import Path
+          ok = 0
+          fail = 0
+          for p in Path('.').rglob('*.py'):
+              if any(x in p.parts for x in ('venv', '__pycache__', '.cache')):
+                  continue
+              try:
+                  ast.parse(p.read_text(encoding='utf-8'))
+                  ok += 1
+              except SyntaxError as e:
+                  print(f'❌ {p}: {e}')
+                  fail += 1
+          print(f'✅ {ok} files OK, {fail} with syntax errors')
+          sys.exit(1 if fail else 0)
+          "
+
+  security-check:
+    name: Security — scan for committed secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify no secrets are committed
+        run: |
+          set -e
+          # Files che NON devono essere mai in repo
+          for f in .env memory.json tasks.db memory_graph.db data/auth.json data/canaries.json; do
+            if [ -f "$f" ] && git ls-files --error-unmatch "$f" 2>/dev/null; then
+              echo "❌ FILE SENSIBILE COMMESSO: $f"
+              exit 1
+            fi
+          done
+          echo "✅ Nessun file sensibile in repo"
+
+      - name: Scan for hardcoded API keys
+        run: |
+          set -e
+          # Pattern: chiavi Anthropic, OpenAI, AWS, generic API keys ≥30 chars
+          # Esclude commenti, esempi, docs
+          if grep -rEn "sk-ant-api03-[a-zA-Z0-9_-]{50,}" --include="*.py" --include="*.json" --exclude-dir=venv --exclude-dir=.git . 2>/dev/null; then
+            echo "❌ HARDCODED ANTHROPIC API KEY"
+            exit 1
+          fi
+          if grep -rEn "AKIA[0-9A-Z]{16}" --include="*.py" --include="*.json" --exclude-dir=venv --exclude-dir=.git . 2>/dev/null; then
+            echo "❌ HARDCODED AWS ACCESS KEY"
+            exit 1
+          fi
+          echo "✅ No hardcoded API keys detected"
