@@ -95,6 +95,13 @@ crash_report_*.txt
 backups/
 *.backup
 *.bak
+# Archives can bundle secrets (.env) — never commit (root cause of the 2026-05 key leak)
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+*.rar
 
 # ============ DB ============
 *.db

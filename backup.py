@@ -23,7 +23,8 @@ INCLUDE_FILES = [
     "workspaces.json",
     "docs_index_meta.json",
     "docs_index.npz",
-    ".env",
+    # NOTE: .env is intentionally NOT backed up — bundling secrets in a zip is what
+    # caused the 2026-05 key leak. Keep credentials only in .env (gitignored).
 ]
 INCLUDE_DIRS = ["docs", "assets/music"]
 

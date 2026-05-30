@@ -59,8 +59,8 @@ Ha **31 agenti specialisti virtuali** organizzati come un'azienda vera (governan
 
 ### Installazione
 ```bash
-git clone https://github.com/<your-username>/vega.git
-cd vega
+git clone https://github.com/amirpiccardodev-maker/VEGA.git
+cd VEGA
 setup.bat              # Windows: crea venv + installa deps
 ```
 

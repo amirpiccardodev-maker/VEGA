@@ -59,8 +59,8 @@ It has **31 virtual specialist agents** organized like a real company (governanc
 
 ### Install
 ```bash
-git clone https://github.com/amirpiccardodev-maker/vega.git
-cd vega
+git clone https://github.com/amirpiccardodev-maker/VEGA.git
+cd VEGA
 setup.bat              # Windows: creates venv + installs deps
 ```
 

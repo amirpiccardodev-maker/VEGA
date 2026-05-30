@@ -1,6 +1,6 @@
 // Service Worker minimo per rendere Vega una PWA installabile.
 // Cache statici (CSS/JS/icone), passa attraverso le API live.
-const CACHE_NAME = "vega-v14-rebrand";
+const CACHE_NAME = "vega-v15-orb";
 const STATIC_ASSETS = [
   "/",
   "/style.css",
@@ -60,15 +60,18 @@ self.addEventListener("fetch", (e) => {
   if (url.pathname.startsWith("/api/") || url.pathname === "/ws" || url.pathname.startsWith("/assets/music/")) {
     return;
   }
+  if (e.request.method !== "GET") return;
+  // Network-first: always serve the freshest code when the server is reachable,
+  // fall back to the cached copy only when offline. This prevents stale JS/CSS
+  // from shadowing updates (cache-first did exactly that). Cache stays populated
+  // for offline PWA use.
   e.respondWith(
-    caches.match(e.request).then((cached) =>
-      cached || fetch(e.request).then((resp) => {
-        if (resp.ok && e.request.method === "GET") {
-          const clone = resp.clone();
-          caches.open(CACHE_NAME).then((c) => c.put(e.request, clone).catch(() => null));
-        }
-        return resp;
-      }).catch(() => cached)
-    )
+    fetch(e.request).then((resp) => {
+      if (resp && resp.ok) {
+        const clone = resp.clone();
+        caches.open(CACHE_NAME).then((c) => c.put(e.request, clone).catch(() => null));
+      }
+      return resp;
+    }).catch(() => caches.match(e.request))
   );
 });
