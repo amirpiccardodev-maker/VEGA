@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/vega_preview.png" alt="VEGA" width="150" />
+
 # ✦ V.E.G.A.
 
 > **Voice. Eyes. Guidance. Agency.**
@@ -10,7 +12,7 @@ Self-hosted personal AI assistant — Italian-first, privacy-first, with a 31-ag
 [![License: MIT](https://img.shields.io/github/license/amirpiccardodev-maker/vega?style=flat-square)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.14+-blue?style=flat-square&logo=python)](https://www.python.org)
 [![Claude](https://img.shields.io/badge/Powered_by-Anthropic_Claude_4.5-7c3aed?style=flat-square)](https://www.anthropic.com)
-[![GDPR](https://img.shields.io/badge/GDPR-compliant_by_design-success?style=flat-square)]()
+[![GDPR](https://img.shields.io/badge/GDPR-by_design-success?style=flat-square)]()
 [![NIS2](https://img.shields.io/badge/NIS2-aligned-success?style=flat-square)]()
 [![Last commit](https://img.shields.io/github/last-commit/amirpiccardodev-maker/vega?style=flat-square)](https://github.com/amirpiccardodev-maker/vega/commits/main)
 [![Stars](https://img.shields.io/github/stars/amirpiccardodev-maker/vega?style=flat-square)](https://github.com/amirpiccardodev-maker/vega/stargazers)
@@ -27,7 +29,7 @@ Self-hosted personal AI assistant — Italian-first, privacy-first, with a 31-ag
 
 Vega è un **assistente AI personale completo** che gira sul tuo PC. Niente cloud (eccetto le chiamate API ad Anthropic, già cifrate HTTPS). Niente dati che escono se non quelli necessari per generare le risposte.
 
-Ha **31 agenti specialisti virtuali** organizzati come un'azienda vera (governance, compliance, operations, intelligence) con cui puoi parlare individualmente, **124+ tool** integrati (mail, calendar, web, vision, image gen, file ops…), **memoria multi-livello persistente**, **18 layer di sicurezza enterprise-grade** allineati GDPR + NIS2, e una **UI liquida generativa** (orb WebGL che respira e reagisce alla voce) con voce italiana.
+Ha **31 agenti specialisti virtuali** organizzati come un'azienda vera (governance, compliance, operations, intelligence) con cui puoi parlare individualmente, **124+ tool** integrati (mail, calendar, web, vision, image gen, file ops…), **memoria multi-livello persistente**, **18 layer di sicurezza** progettati secondo i principi di GDPR e NIS2, e una **UI liquida generativa** (orb WebGL che respira e reagisce alla voce) con voce italiana.
 
 ---
 
