@@ -83,7 +83,7 @@ def get_model() -> str:
     return available[0]
 
 
-def chat(prompt: str, system: str = None, timeout: float = 20.0) -> str:
+def chat(prompt: str, system: str = None, timeout: float = 60.0) -> str:
     """Sync chat. Returns response text or empty string on failure."""
     if not is_available():
         return ""

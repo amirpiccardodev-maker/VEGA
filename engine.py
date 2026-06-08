@@ -422,7 +422,8 @@ class Engine:
             return True
 
         # 9. Local LLM fallback (Ollama) — only if enabled in settings
-        if memory.get_preferences().get("local_llm_enabled", False):
+        if (memory.get_preferences().get("local_brain_enabled", False)
+                or memory.get_preferences().get("local_llm_enabled", False)):
             try:
                 import local_brain
                 if local_brain.is_available() and local_brain.should_use_local(text):
