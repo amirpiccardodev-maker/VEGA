@@ -1474,6 +1474,14 @@ async function loadSettings() {
     if (tm) tm.checked = !!p.team_mode;
     const svt = $("set-sync-voice-text");
     if (svt) svt.checked = p.sync_voice_text !== false;  // default true
+    const lp = $("set-llm-provider");
+    if (lp) lp.value = p.llm_provider || "anthropic";
+    const om = $("set-openai-model");
+    if (om) om.value = p.openai_model || "";
+    const gm = $("set-gemini-model");
+    if (gm) gm.value = p.gemini_model || "";
+    const ps = $("set-provider-status");
+    if (ps) ps.textContent = (p.llm_provider && p.llm_provider !== "anthropic") ? ("— attivo: " + p.llm_provider) : "";
     // Probe Ollama status
     try {
       const r2 = await fetch("/api/local_brain/status");
@@ -1948,6 +1956,9 @@ $("set-save").addEventListener("click", async () => {
     local_brain_enabled: ($("set-local-brain") ? $("set-local-brain").checked : false),
     team_mode: ($("set-team-mode") ? $("set-team-mode").checked : false),
     sync_voice_text: ($("set-sync-voice-text") ? $("set-sync-voice-text").checked : true),
+    llm_provider: ($("set-llm-provider") ? $("set-llm-provider").value : "anthropic"),
+    openai_model: ($("set-openai-model") ? $("set-openai-model").value.trim() : ""),
+    gemini_model: ($("set-gemini-model") ? $("set-gemini-model").value.trim() : ""),
   };
   await fetch("/api/settings", {
     method: "POST",

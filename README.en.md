@@ -57,7 +57,7 @@ It has **31 virtual specialist agents** organized like a real company (governanc
 - Python 3.14+
 - ~2GB free disk (ML models)
 - Microphone (for voice)
-- Anthropic API key ([console.anthropic.com](https://console.anthropic.com))
+- An AI provider API key — just **one** is enough: **Anthropic** ([console.anthropic.com](https://console.anthropic.com)), **OpenAI**, or **Google Gemini**
 
 ### Install
 ```bash

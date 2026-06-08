@@ -1,13 +1,13 @@
 """Brain: Claude with tool use, safe history truncation, graceful error recovery."""
 import time
 import threading
-from anthropic import Anthropic, APIError, APIStatusError, RateLimitError
-from config import ANTHROPIC_API_KEY, MODEL, MAX_TOKENS
+from anthropic import APIError, APIStatusError, RateLimitError
+from config import MODEL, MAX_TOKENS
 import tools as tool_registry
 import memory
 from personality import build_static_system_prompt, build_dynamic_system_part
 
-client = Anthropic(api_key=ANTHROPIC_API_KEY)
+import llm_provider
 
 MAX_HISTORY_MSGS = 16  # short window to limit prompt size
 MAX_TOOL_ITERATIONS = 5  # lowered from 8: prevents runaway tool chains
@@ -541,7 +541,7 @@ class Brain:
             for attempt in range(RATE_LIMIT_RETRIES):
                 try:
                     kwargs = dict(
-                        model=MODEL,
+                        model=llm_provider.main_model(),
                         max_tokens=MAX_TOKENS,
                         system=system_blocks,
                         tools=schemas,
@@ -550,7 +550,7 @@ class Brain:
                     if thinking_param:
                         kwargs["thinking"] = thinking_param
                         kwargs["max_tokens"] = max(MAX_TOKENS, 8192)
-                    return client.messages.create(**kwargs)
+                    return llm_provider.create(**kwargs)
                 except RateLimitError as e:
                     last_err = e
                     wait = RATE_LIMIT_BACKOFF_BASE * (2 ** attempt)
@@ -576,7 +576,7 @@ class Brain:
                     try:
                         import cost_tracker
                         cost_tracker.record(
-                            caller="brain.ask", model=MODEL,
+                            caller="brain.ask", model=llm_provider.main_model(),
                             input_tokens=in_t, output_tokens=out_t,
                             cache_read=cr_t, cache_write=cw_t,
                         )
@@ -648,8 +648,8 @@ class Brain:
 
                 while tries_left > 0 and not stream_started:
                     try:
-                        with client.messages.stream(
-                            model=MODEL,
+                        with llm_provider.stream(
+                            model=llm_provider.main_model(),
                             max_tokens=MAX_TOKENS,
                             system=system_blocks,
                             tools=schemas,
@@ -696,7 +696,7 @@ class Brain:
                     try:
                         import cost_tracker
                         cost_tracker.record(
-                            caller="brain.ask_stream", model=MODEL,
+                            caller="brain.ask_stream", model=llm_provider.main_model(),
                             input_tokens=in_t, output_tokens=out_t,
                             cache_read=cr_t, cache_write=cw_t,
                         )

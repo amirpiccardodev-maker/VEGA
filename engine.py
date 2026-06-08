@@ -446,10 +446,10 @@ class Engine:
         except BrainAPIError as e:
             self.emit("error", {"message": str(e)})
             self.emit("api_down", {
-                "message": "API Anthropic non raggiungibile.",
-                "suggestion": "Puoi abilitare il modello locale (Ollama) dalle Impostazioni."
+                "message": "Modello AI non raggiungibile.",
+                "suggestion": "Verifica la chiave del provider selezionato (Anthropic/OpenAI/Gemini) nel file .env, oppure abilita il modello locale (Ollama) dalle Impostazioni."
             })
-            err_msg = "Non riesco a raggiungere i miei sistemi centrali. Controlla la connessione o abilita il modello locale dalle impostazioni."
+            err_msg = "Non riesco a contattare il modello AI. Verifica di aver inserito la chiave del provider scelto (Anthropic, OpenAI o Gemini) nel file .env — oppure abilita il modello locale dalle Impostazioni."
             self._emit_text("vega", err_msg)
             self._set_state("speaking")
             self._speak(err_msg)

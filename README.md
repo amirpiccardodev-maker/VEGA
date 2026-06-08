@@ -57,7 +57,7 @@ Ha **31 agenti specialisti virtuali** organizzati come un'azienda vera (governan
 - Python 3.14+
 - ~2GB disco libero (modelli ML)
 - Microfono (per voce)
-- API key Anthropic ([console.anthropic.com](https://console.anthropic.com))
+- API key di un provider AI — ne basta **una**: **Anthropic** ([console.anthropic.com](https://console.anthropic.com)), **OpenAI** o **Google Gemini**
 
 ### Installazione
 ```bash
@@ -68,7 +68,7 @@ setup.bat              # Windows: crea venv + installa deps
 
 ### Configurazione
 1. Copia `.env.example` in `.env`
-2. Aggiungi la tua `ANTHROPIC_API_KEY`
+2. Aggiungi la chiave del provider che preferisci: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` o `GEMINI_API_KEY` (poi scegli il provider da **Impostazioni**)
 3. Opzionale: `GMAIL_APP_PASSWORD` per accesso email
 
 ### Avvio

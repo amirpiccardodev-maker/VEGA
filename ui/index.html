@@ -226,6 +226,22 @@
         </select>
       </div>
       <div class="setting-row">
+        <label>Provider AI <span id="set-provider-status" style="opacity:.6;font-size:.85em"></span></label>
+        <select id="set-llm-provider">
+          <option value="anthropic">Anthropic Claude (default)</option>
+          <option value="openai">OpenAI (GPT)</option>
+          <option value="gemini">Google Gemini</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label>Modello OpenAI <span style="opacity:.6;font-size:.85em">(se selezioni OpenAI)</span></label>
+        <input id="set-openai-model" type="text" placeholder="es. gpt-4o">
+      </div>
+      <div class="setting-row">
+        <label>Modello Gemini <span style="opacity:.6;font-size:.85em">(se selezioni Gemini)</span></label>
+        <input id="set-gemini-model" type="text" placeholder="es. gemini-2.0-flash">
+      </div>
+      <div class="setting-row">
         <label>Local LLM (Ollama) <span id="set-local-status" style="opacity:.6;font-size:.85em">— offline</span></label>
         <label class="toggle">
           <input type="checkbox" id="set-local-brain">

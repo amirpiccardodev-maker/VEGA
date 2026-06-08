@@ -17,12 +17,11 @@ vs Sonnet:
 """
 import json
 import time
-from anthropic import Anthropic, APIError, RateLimitError
+from anthropic import APIError, RateLimitError
 
-from config import ANTHROPIC_API_KEY, MODEL_FAST, MAX_TOKENS_FAST
+from config import MAX_TOKENS_FAST
 import memory
-
-_client = Anthropic(api_key=ANTHROPIC_API_KEY)
+import llm_provider
 
 
 def fast_call(prompt: str, system: str = "", max_tokens: int = None) -> str:
@@ -34,10 +33,11 @@ def fast_call(prompt: str, system: str = "", max_tokens: int = None) -> str:
     try:
         for attempt in range(3):
             try:
-                resp = _client.messages.create(
-                    model=MODEL_FAST,
+                resp = llm_provider.create(
+                    model=llm_provider.fast_model(),
                     max_tokens=mt,
                     system=sys_blocks if sys_blocks else "",
+                    tools=[],
                     messages=[{"role": "user", "content": prompt}],
                 )
                 break

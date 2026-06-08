@@ -376,7 +376,8 @@ def api_settings_set():
                "sounds_enabled", "privacy_mode", "voice_interrupt",
                "always_on", "always_on_window_sec",
                "local_brain_enabled", "local_llm_enabled", "team_mode",
-               "sync_voice_text"}
+               "sync_voice_text",
+               "llm_provider", "anthropic_model", "openai_model", "gemini_model"}
     for k, v in data.items():
         if k in allowed:
             memory.set_preference(k, v)
