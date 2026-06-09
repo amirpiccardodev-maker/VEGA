@@ -1500,9 +1500,9 @@ async function loadSettings() {
   } catch (e) {}
 }
 
-$("settings-btn").addEventListener("click", async () => {
-  await loadSettings();
-  openModal("settings-modal");
+$("settings-btn").addEventListener("click", () => {
+  openModal("settings-modal");   // open immediately; don't block on the Ollama probe
+  loadSettings();
 });
 
 // Proposte panel
@@ -2767,27 +2767,40 @@ window.addEventListener("drop", async (e) => {
   _dragCounter = 0;
   if (_dropOverlay) _dropOverlay.classList.remove("show");
   if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) return;
-
-  const files = Array.from(e.dataTransfer.files);
-  for (const f of files) {
-    const name = f.name.toLowerCase();
-    const isAudio = /\.(mp3|wav|m4a|ogg|flac)$/.test(name) || (f.type && f.type.startsWith("audio/"));
-    if (isAudio) {
-      // Music library upload
-      await uploadFiles([f]);
-    } else {
-      // Send to analyze endpoint
-      const fd = new FormData();
-      fd.append("file", f);
-      showToast(`Analizzo ${f.name}...`);
-      try {
-        await fetch("/api/analyze_file", { method: "POST", body: fd });
-      } catch (err) {
-        showToast("Errore analisi file");
-      }
-    }
-  }
+  await uploadToKnowledge(e.dataTransfer.files);
 });
+
+// Upload documents to the knowledge base (RAG). Audio still goes to the music library.
+async function uploadToKnowledge(fileList) {
+  const all = Array.from(fileList);
+  const isAudio = (f) => /\.(mp3|wav|m4a|ogg|flac)$/i.test(f.name) || (f.type && f.type.startsWith("audio/"));
+  const audio = all.filter(isAudio);
+  const docs = all.filter((f) => !isAudio(f));
+  if (audio.length) { try { await uploadFiles(audio); } catch (e) {} }
+  if (!docs.length) return;
+  const fd = new FormData();
+  docs.forEach((f) => fd.append("file", f));
+  showToast(`Aggiungo ${docs.length} file alla knowledge base… (indicizzo)`);
+  try {
+    const r = await fetch("/api/knowledge/add", { method: "POST", body: fd });
+    const j = await r.json();
+    if (j.ok) showToast(`✅ ${(j.added || []).length} file aggiunti alla knowledge base`);
+    else showToast("Errore: " + (j.error || "upload"));
+  } catch (e) { showToast("Errore upload knowledge base"); }
+}
+
+// "+" (FILE) button in the input bar -> file picker -> knowledge base
+(function () {
+  const btn = document.getElementById("kb-add-btn");
+  const inp = document.getElementById("kb-file-input");
+  if (btn && inp) {
+    btn.addEventListener("click", () => inp.click());
+    inp.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files.length) uploadToKnowledge(e.target.files);
+      e.target.value = "";
+    });
+  }
+})();
 
 // Library search box
 const searchInput = document.getElementById("pl-search");

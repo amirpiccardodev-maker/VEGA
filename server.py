@@ -2062,6 +2062,38 @@ def api_analyze_file():
     return jsonify({"ok": True, "filename": safe, "path": target})
 
 
+@app.route("/api/knowledge/add", methods=["POST"])
+def api_knowledge_add():
+    """Add uploaded file(s) to the personal knowledge base (RAG docs/) and re-index."""
+    files = request.files.getlist("file")
+    if not files:
+        return jsonify({"ok": False, "error": "no file"}), 400
+    try:
+        from tools import rag
+    except Exception as e:
+        return jsonify({"ok": False, "error": f"RAG non disponibile: {e}"}), 500
+    docs_dir = str(rag.DOCS_DIR)
+    os.makedirs(docs_dir, exist_ok=True)
+    allowed = {".pdf", ".txt", ".md", ".markdown", ".csv", ".log", ".docx"}
+    saved, skipped = [], []
+    for f in files:
+        if not f or not f.filename:
+            continue
+        safe = secure_filename(f.filename) or "doc"
+        if os.path.splitext(safe)[1].lower() not in allowed:
+            skipped.append(f.filename)
+            continue
+        f.save(os.path.join(docs_dir, safe))
+        saved.append(safe)
+    if not saved:
+        return jsonify({"ok": False, "error": "Tipi non supportati (usa PDF, txt, md, csv, docx)", "skipped": skipped}), 400
+    try:
+        result = rag.run("index_docs", {"force": True})
+    except Exception as e:
+        result = f"file salvati, ma indicizzazione fallita: {e}"
+    return jsonify({"ok": True, "added": saved, "skipped": skipped, "index": result})
+
+
 @app.route("/api/music/delete", methods=["POST"])
 def api_music_delete():
     data = request.get_json(force=True) or {}

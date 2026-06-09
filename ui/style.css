@@ -1045,6 +1045,8 @@ body.glitching::after {
 .msg.user .who { color: var(--gold); }
 .msg.vega .who { color: var(--cyan); }
 .msg .text { color: #d6f7ff; font-family: "Consolas", monospace; word-break: break-word; }
+/* Allow selecting/copying chat text (overrides body user-select:none) */
+.msg, .msg .text, .msg .who, #chat-log, #messages { user-select: text; -webkit-user-select: text; cursor: text; }
 
 /* Streaming cursor — blinks while Vega is generating */
 .stream-cursor {

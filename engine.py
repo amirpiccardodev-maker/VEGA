@@ -446,6 +446,22 @@ class Engine:
             self._consume_brain_stream(text)
         except BrainAPIError as e:
             self.emit("error", {"message": str(e)})
+            # Fallback: if Ollama is enabled + reachable, answer locally instead of failing.
+            try:
+                import local_brain
+                _p = memory.get_preferences()
+                if (_p.get("local_brain_enabled", False) or _p.get("local_llm_enabled", False)) and local_brain.is_available():
+                    self._set_state("thinking", message="LOCAL LLM (fallback)")
+                    reply = local_brain.chat(text, system="Sei Vega, un assistente AI personale italiano. Rispondi in italiano, breve e diretto.")
+                    if reply:
+                        self._emit_text("vega", reply)
+                        self._set_state("speaking")
+                        self._speak(reply)
+                        self.emit("model_used", {"model": "ollama:" + local_brain.get_model()})
+                        self._set_state("idle")
+                        return True
+            except Exception:
+                pass
             self.emit("api_down", {
                 "message": "Modello AI non raggiungibile.",
                 "suggestion": "Verifica la chiave del provider selezionato (Anthropic/OpenAI/Gemini) nel file .env, oppure abilita il modello locale (Ollama) dalle Impostazioni."
