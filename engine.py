@@ -445,7 +445,6 @@ class Engine:
         try:
             self._consume_brain_stream(text)
         except BrainAPIError as e:
-            self.emit("error", {"message": str(e)})
             # Fallback: if Ollama is enabled + reachable, answer locally instead of failing.
             try:
                 import local_brain
@@ -462,6 +461,8 @@ class Engine:
                         return True
             except Exception:
                 pass
+            # Fallback unavailable or failed → now surface the provider error.
+            self.emit("error", {"message": str(e)})
             self.emit("api_down", {
                 "message": "Modello AI non raggiungibile.",
                 "suggestion": "Verifica la chiave del provider selezionato (Anthropic/OpenAI/Gemini) nel file .env, oppure abilita il modello locale (Ollama) dalle Impostazioni."
